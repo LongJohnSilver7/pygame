@@ -18,64 +18,62 @@ class Algorithms:
                     yield l_swap(unsorted_list,i, i+1)
 
     def quicksort_generator(unsorted_list, lower, upper):
-
-        #round down
+        if lower >= upper:
+            return
+        
         ind_pivot = lower
         val_pivot = unsorted_list[ind_pivot]
-        print(val_pivot)
         
- 
-
         ind_upper = upper
         ind_lower = lower+1
-        lastswapped = None
+   
+        if ind_upper <= ind_lower:
+            return
+
+        fix = True
 
         while(ind_upper > ind_lower):
             print('calculating')
             swp_lower = None
-            for i in range(ind_lower,upper):
+            for i in range(ind_lower,upper+1):
                 if unsorted_list[i]>val_pivot:
-                
-                    ind_lower = i+1
-                    print(f'ind lower is: {ind_lower}')
+                    ind_lower = i
                     swp_lower = i
                     break
 
             swp_upper = None
             for j in range(ind_upper,lower, -1):
                 if unsorted_list[j]<val_pivot:
-                    print(f'ind upper is: {ind_upper}')
-                    ind_upper = j-1
+                    ind_upper = j
                     swp_upper = j
                     break
    
 
             if swp_upper != None and swp_lower != None:  
-                # last element that was swapped and bigger
-                lastswapped = swp_upper
-                print(f'swapping {swp_lower}  with {swp_upper}')
-                #time.sleep(0.5)
                 yield l_swap(unsorted_list, swp_lower, swp_upper)
+            elif swp_upper is None and swp_lower is None:
+                return
+            elif swp_upper is None:
+                fix = False
+                break
+            elif swp_lower is None:
+                yield l_swap(unsorted_list, ind_pivot, ind_upper)
+                ind_pivot = ind_upper
+                fix = False
+                break
 
-        #print(swp_lower)
-        # reverse last faulty swap
-        yield l_swap(unsorted_list, swp_lower, swp_upper)
-        # fix pivot 
-        yield l_swap(unsorted_list, ind_pivot, swp_upper-1)
 
-        ind_pivot = swp_upper-1
-        print(f'upper is {upper} and lower is {lower}')
+        if fix == True:
+            yield l_swap(unsorted_list, swp_lower, swp_upper)
+            yield l_swap(unsorted_list, ind_pivot, swp_upper)
+            ind_pivot = swp_upper
+        
+        
         rec_lower = Algorithms.quicksort_generator(unsorted_list, lower, ind_pivot-1)
         rec_upper = Algorithms.quicksort_generator(unsorted_list, ind_pivot+1,upper)
-        print('asdfasdfasdfasdf')
-        print(rec_lower)
-        #chain(rec_lower, rec_upper)
-        for k in rec_lower:
-            print(f'generator is {k}')
+        rec = chain(rec_lower, rec_upper)
+        for k in rec:
             yield k
-        #print(rec)
-       # for it in rec:
-       #     yield from it
 
     def pivot_heuristic(lst):
         # round down
@@ -115,12 +113,14 @@ def start_sort(unsorted_list, identifier, frameheight, backgroundcolor):
         fnct = fnct(unsorted_list, 0, len(unsorted_list)-1)
     else:
         fnct = fnct(unsorted_list)
+    
+    pygame.display.set_caption('Sortingalgorithms' + ' | ' + identifier  )
 
     #print(fnct)
     color = (255,255,255)
     if fnct is not None:
         for i in fnct:
-            print(i)
+            #print(i)
             in1 = i[0]
             len1 = i[1]
             in2 = i[2]
@@ -152,6 +152,7 @@ if __name__ == "__main__":
         height = getattr(display.Info(), 'current_h')
         width = getattr(display.Info(), 'current_w')
         
+
         lower_bound = 0
         upper_bound = height
         
@@ -165,7 +166,7 @@ if __name__ == "__main__":
             drawline_straight(screen,ind,clr, num, height)
         pygame.display.flip()
         time.sleep(1)
-        algorithm = 'quicksort'
+        algorithm = 'bubblesort'
         print(numbers_unsorted)
         start_sort(numbers_unsorted, algorithm, height, bckgr)
         
